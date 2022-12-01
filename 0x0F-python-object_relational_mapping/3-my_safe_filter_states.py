@@ -1,16 +1,13 @@
 #!/usr/bin/python3
-''' script for task 2
-    script should take 4 arguments: mysql username,
-    mysql password, database name and state name searched
-'''
+'''script for task 3'''
 
 import MySQLdb
 import sys
 
 
-def list_with_name():
-    ''' displays all values in the states table in hbtn db where name
-        matches the argument passed to the script
+def secure_fetch():
+    ''' a safer way to displays all values in the states table of hbtn_0e_0_usa
+        where name matches the argument passed to the script
     '''
     username = sys.argv[1]
     password = sys.argv[2]
@@ -22,8 +19,9 @@ def list_with_name():
     db = MySQLdb.connect(host=host, user=username, passwd=password,
                          db=db_name, port=port)
     cur = db.cursor()
-    cur.execute(('SELECT * FROM states WHERE BINARY name = \'{}\'\
-                 ORDER BY id ASC;').format(state_name))
+    cur.execute("SELECT * FROM states WHERE name = %s ORDER BY id ASC;",
+                [state_name])
+
     result = cur.fetchall()
     cur.close()
     db.close()
@@ -34,4 +32,4 @@ def list_with_name():
 
 
 if __name__ == '__main__':
-    list_with_name()
+    secure_fetch()
