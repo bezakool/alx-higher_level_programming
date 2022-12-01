@@ -1,27 +1,23 @@
 #!/usr/bin/python3
-'''script for task 3'''
+'''task 4 script'''
 
 import MySQLdb
 import sys
 
 
-def secure_fetch():
-    ''' a safer way to displays all values in the states table of hbtn_0e_0_usa
-        where name matches the argument passed to the script
-    '''
+def list_all():
+    '''lists all cities from db'''
     username = sys.argv[1]
     password = sys.argv[2]
     db_name = sys.argv[3]
-    state_name = sys.argv[4]
     host = 'localhost'
     port = 3306
 
     db = MySQLdb.connect(host=host, user=username, passwd=password,
                          db=db_name, port=port)
     cur = db.cursor()
-    cur.execute("SELECT * FROM states WHERE name = %s ORDER BY id ASC;",
-                [state_name])
-
+    cur.execute('SELECT c.id, c.name, s.name FROM cities c LEFT ' +
+                'JOIN states s ON c.state_id = s.id ORDER BY c.id ASC;')
     result = cur.fetchall()
     cur.close()
     db.close()
@@ -32,4 +28,4 @@ def secure_fetch():
 
 
 if __name__ == '__main__':
-    secure_fetch()
+    list_all()
