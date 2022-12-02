@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """
-Lists all State objects from the database hbtn_0e_6_usa.
-Usage: ./7-model_state_fetch_all.py <mysql username> /
-                                    <mysql password> /
-                                    <database name>
+Prints the first State object from the database hbtn_0e_6_usa.
+Usage: ./8-model_state_fetch_first.py <mysql username> /
+                                      <mysql password> /
+                                      <database name>
 """
 import sys
 from sqlalchemy import create_engine
@@ -17,5 +17,8 @@ if __name__ == "__main__":
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    for state in session.query(State).order_by(State.id):
+    state = session.query(State).order_by(State.id).first()
+    if state is None:
+        print("Nothing")
+    else:
         print("{}: {}".format(state.id, state.name))
