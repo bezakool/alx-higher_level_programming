@@ -1,28 +1,34 @@
 #!/usr/bin/python3
-"""
-a script that creates the State “California” with the City “San Francisco”
-from the database hbtn_0e_100_usa: (100-relationship_states_cities.py)
-"""
-import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
-from relationship_state import Base, State
+'''script for task 15'''
+
+from relationship_state import State, Base
 from relationship_city import City
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import sys
 
 
 if __name__ == '__main__':
-    engine = create_engine(
-        'mysql+mysqldb://{}:{}@localhost:3306/{}'
-        .format(sys.argv[1], sys.argv[2], sys.argv[3])
-    )
-    Base.metadata.create_all(engine)
+    username = sys.argv[1]
+    password = sys.argv[2]
+    db_name = sys.argv[3]
+    host = 'localhost'
+    port = '3306'
+
+    engine = create_engine('mysql+mysqldb://{}:{}@{}:{}/{}'.format(
+                           username, password, host, port, db_name
+                           ), pool_pre_ping=True)
     Session = sessionmaker(bind=engine)
-    session = Session()
+    Base.metadata.create_all(engine)
+    local_session = Session()
 
-    state_data = State(name="California")
-    city_data = City(name="San Francisco")
-    state_data.cities.append(city_data)
+    new_state = State(name='California')
+    new_city = City(name='San Francisco')
+    new_state.cities.append(new_city)
 
-    session.add(state_data)
-    session.add(city_data)
-    session.commit()
+    local_session.add(new_state)
+    local_session.add(new_city)
+    local_session.commit()
+
+    local_session.close()
+    engine.dispose()
