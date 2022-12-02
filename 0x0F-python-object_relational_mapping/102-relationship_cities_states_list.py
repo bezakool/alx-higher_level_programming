@@ -1,29 +1,23 @@
 #!/usr/bin/python3
-'''script for task 17'''
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from relationship_state import State, Base
-from relationship_city import City
+"""
+a script that lists all City objects from the database hbtn_0e_101_usa
+"""
 import sys
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from relationship_city import City
+from relationship_state import Base, State
+
 
 if __name__ == '__main__':
-    username = sys.argv[1]
-    password = sys.argv[2]
-    db_name = sys.argv[3]
-    host = 'localhost'
-    port = '3306'
-
-    engine = create_engine('mysql+mysqldb://{}:{}@{}:{}/{}'.format(
-                            username, password, host, port, db_name
-                            ), pool_pre_ping=True)
+    engine = create_engine(
+        'mysql+mysqldb://{}:{}@localhost:3306/{}'
+        .format(sys.argv[1], sys.argv[2], sys.argv[3])
+    )
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
-    loc_session = Session()
-    cities = loc_session.query(City).order_by(City.id.asc()).all()
-
-    for city in cities:
-        print('{}: {} -> {}'.format(city.id, city.name, city.state.name))
-
-    loc_session.close()
-    engine.dispose()
+    session = Session()
+    resArr = session.query(City.id, City.name, State.name)
+    resFilteredArr = resArr.filter(City.state_id == State.id).order_by(City.id)
+    for r in resFilteredArr:
+        print("{}: {} -> {}".format(r[0], r[1], r[2]))
