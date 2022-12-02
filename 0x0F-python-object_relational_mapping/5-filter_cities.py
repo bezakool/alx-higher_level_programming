@@ -1,32 +1,21 @@
 #!/usr/bin/python3
-'''script for task 5'''
-
-import MySQLdb
+"""
+Displays all cities of a given state from the
+states table of the database hbtn_0e_4_usa.
+Safe from SQL injections.
+Usage: ./5-filter_cities.py <mysql username> \
+                            <mysql password> \
+                            <database name> \
+                            <state name searched>
+"""
 import sys
+import MySQLdb
 
-
-def list_by_state():
-    '''lists all cities of a state passed as argument to the script'''
-    username = sys.argv[1]
-    password = sys.argv[2]
-    db_name = sys.argv[3]
-    state_name = sys.argv[4]
-    host = 'localhost'
-    port = 3306
-
-    db = MySQLdb.connect(host=host, user=username, passwd=password,
-                         db=db_name, port=port)
-    cur = db.cursor()
-    cur.execute('SELECT c.name FROM cities c INNER JOIN states s ' +
-                'ON s.id = c.state_id WHERE ' +
-                'BINARY s.name = %s ' +
-                'ORDER BY c.id ASC;', [state_name])
-    result = cur.fetchall()
-    cur.close()
-    db.close()
-
-    print(', '.join(map(lambda x: x[0], result)))
-
-
-if __name__ == '__main__':
-    list_by_state()
+if __name__ == "__main__":
+    db = MySQLdb.connect(user=sys.argv[1], passwd=sys.argv[2], db=sys.argv[3])
+    c = db.cursor()
+    c.execute("SELECT * FROM `cities` as `c` \
+                INNER JOIN `states` as `s` \
+                   ON `c`.`state_id` = `s`.`id` \
+                ORDER BY `c`.`id`")
+    print(", ".join([ct[2] for ct in c.fetchall() if ct[4] == sys.argv[4]]))
