@@ -1,18 +1,21 @@
 #!/usr/bin/python3
 """
 a python file that contains the class definition
-of a City and an instance Base = declarative_base()
+of a State and an instance Base = declarative_base()
 """
 from sqlalchemy import Column, Integer, String, ForeignKey, MetaData
 from sqlalchemy.ext.declarative import declarative_base
-from relationship_state import Base
+from sqlalchemy.orm import relationship
+
+my_metadata = MetaData()
+Base = declarative_base(metadata=my_metadata)
 
 
-class City(Base):
+class State(Base):
     """
     Class with id, name, and state_id attributes of each city
     """
-    __tablename__ = 'cities'
+    __tablename__ = 'states'
     id = Column(
         Integer,
         nullable=False,
@@ -22,8 +25,4 @@ class City(Base):
         String(128),
         nullable=False
     )
-    state_id = Column(
-        Integer,
-        ForeignKey('states.id'),
-        nullable=False
-    )
+    cities = relationship('City', backref='states')
